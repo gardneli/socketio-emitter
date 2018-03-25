@@ -2,6 +2,7 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const jsyaml = require('js-yaml');
 const testJson = {
   "symbol": "AAPL",
   "companyName": "Apple Inc.",
@@ -41,6 +42,9 @@ const testJson = {
   "ytdChange": 0.3665,
 };
 
+let configMap;
+let configMessage = "Default config message: Hello, Default!";
+
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -50,7 +54,7 @@ io.on('connection', function(socket){
   let i = 1;
   function transmitLoop() {
     setTimeout(function () {
-      console.log('Transmitting message: ', testJson);
+      console.log('Transmitting message: ', testJson.symbol);
       io.emit('message', testJson);
       i++;
       if (i < 10) {
@@ -68,3 +72,38 @@ io.on('connection', function(socket){
 http.listen(3001, function() {
   console.log('listening on *:3001');
 });
+
+// Function to periodically retrieve the ConfigMap
+setInterval(() => {
+  retrieveConfigMap().then((config) => {
+    if (!config) {
+      configMessage = null;
+      return;
+    }
+
+    if (JSON.stringify(config) !== JSON.stringify(configMap)) {
+      configMap = config;
+      configMessage = config.message;
+      console.log('ConfigMap message: ', config.message);
+    }
+  }).catch((err) => {
+
+  });
+}, 2000);
+
+// Function to find the ConfigMap
+const openshiftRestClient = require('openshift-rest-client');
+function retrieveConfigMap() {
+  const settings = {
+    request: {
+      strictSSL: false
+    }
+  };
+
+  return openshiftRestClient(settings).then((client) => {
+    const configMapName = 'app-config';
+    return client.configmaps.find(configMapName).then((configMap) => {
+      return jsyaml.safeLoad(configMap.data['app-config.yml']);
+    });
+  });
+}
