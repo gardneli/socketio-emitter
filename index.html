@@ -29,7 +29,8 @@
           return false;
         });
         socket.on('message', function(msg) {
-          $('#messages').append($('<li>').text(msg.message));
+          $('#messages').append($('<li>').text(msg.symbol));
+          $('#messages').append($('<li>').text(msg.open));
         });
       });
     </script>
