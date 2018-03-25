@@ -2,5 +2,12 @@
   "name": "socketio-emitter",
   "version": "0.0.1",
   "description": "Socket.io emitter",
-  "dependencies": {}
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gardneli/socketio-emitter"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }
