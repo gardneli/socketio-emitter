@@ -2,6 +2,10 @@
   "name": "socketio-emitter",
   "version": "0.0.1",
   "description": "Socket.io emitter",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
